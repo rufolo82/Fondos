@@ -5,7 +5,7 @@ HEADERS = {"User-Agent": "Mozilla/5.0", "Accept-Language": "es-ES"}
 
 def get_from_investing(isin):
     search = f"https://www.investing.com/search/?q={isin}"
-    r = requests.get(search, headers=HEADERS, timeout=10)
+    r = requests.get(search, headers=HEADERS, timeout=3)
     if r.status_code != 200:
         return None
     soup = BeautifulSoup(r.text, "html.parser")

@@ -9,16 +9,24 @@ FUND_ISINS = [
 st.set_page_config(page_title="Fondos de Inversión", layout="wide")
 st.title("📊 Dashboard de Fondos de Inversión")
 
-rows = []
-for isin in FUND_ISINS:
-    data = get_fund_data(isin)
-    if data:
-        data["ISIN"] = isin
-        rows.append(data)
+st.info("Pulsa el botón para cargar los datos de los fondos.")
 
-if not rows:
-    st.error("❌ No se han podido cargar datos de los fondos. Intenta actualizar más tarde.")
-    st.stop()
+@st.cache_data(ttl=3600)
+def load_funds(isins):
+    rows = []
+    for isin in isins:
+        data = get_fund_data(isin)
+        if data:
+            data["ISIN"] = isin
+            rows.append(data)
+    return pd.DataFrame(rows)
 
-df = pd.DataFrame(rows)
-st.dataframe(df, use_container_width=True)
+if st.button("🔄 Cargar fondos"):
+    with st.spinner("Cargando datos..."):
+        df = load_funds(FUND_ISINS)
+
+    if df.empty:
+        st.error("❌ No se han podido cargar datos de los fondos.")
+    else:
+        st.dataframe(df, use_container_width=True)
+
